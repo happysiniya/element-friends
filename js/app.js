@@ -453,6 +453,37 @@ const App = (() => {
     };
   }
 
+  // 기록 지우기: 어른용 메뉴 안에서, 두 자리 × 한 자리 곱셈을 맞혀야 해요
+  let resetAnswer = 0;
+  function newResetQuestion() {
+    const a = 12 + Math.floor(Math.random() * 8);  // 12~19
+    const b = 3 + Math.floor(Math.random() * 7);   // 3~9
+    resetAnswer = a * b;
+    $("#reset-q").textContent = `${a} × ${b}`;
+    $("#reset-answer").value = "";
+  }
+
+  function setupReset() {
+    newResetQuestion();
+    $("#grown-up").addEventListener("toggle", () => { newResetQuestion(); $("#reset-msg").textContent = ""; });
+    $("#reset-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (+$("#reset-answer").value !== resetAnswer) {
+        $("#reset-msg").textContent = "답이 맞지 않아요. 새 문제로 다시 해 주세요.";
+        newResetQuestion();
+        return;
+      }
+      if (!confirm("정말 모든 기록을 지울까요? 되돌릴 수 없어요.")) return;
+      Progress.reset();
+      refreshTableMarks();
+      updateCounters();
+      Quiz.show(true);
+      Kitchen.render();
+      $("#grown-up").open = false;
+      $("#reset-msg").textContent = "";
+    });
+  }
+
   function init() {
     Progress.load();
     renderTable();
@@ -462,15 +493,7 @@ const App = (() => {
     setupCard();
     setupSound();
     $$(".tab").forEach((t) => (t.onclick = () => showView(t.dataset.view)));
-    $("#reset").onclick = () => {
-      if (confirm("지금까지 모은 원소 친구와 요리 기록을 모두 지울까요?")) {
-        Progress.reset();
-        refreshTableMarks();
-        updateCounters();
-        Quiz.show(true);
-        Kitchen.render();
-      }
-    };
+    setupReset();
     updateCounters();
   }
 

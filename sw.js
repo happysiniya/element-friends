@@ -1,6 +1,6 @@
 // 앱 화면과 글꼴을 기기에 저장해 두어서 인터넷이 없어도 열려요.
 // 파일을 고쳐서 다시 올릴 때는 아래 버전 숫자를 하나 올려 주세요.
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL = 'shell-' + VERSION;
 const FONTS = 'fonts-v1';
 const SHELL_FILES = [
