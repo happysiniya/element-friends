@@ -22,6 +22,8 @@
 | `js/quiz.js` | 퀴즈: 난이도 3단계(20, 54, 118), 문제 종류 5가지(기호, 이름, 번호, 어디서 만나, 가족), 한 번에 10문제 |
 | `js/kitchen.js` | 원소 요리사: `PALETTE`의 원소 10개로 `RECIPES` 17가지 만들기 |
 | `css/style.css` | 디자인 전부 |
+| `manifest.json`, `sw.js` | PWA (주소창 옆 "앱 설치"). 화면은 네트워크 우선, Google Fonts는 캐시 우선. https에서만 등록해요 |
+| `icon-192.png`, `icon-512.png` | 앱 아이콘: 앨범 파랑 바탕에 기울어진 1번 수소 반짝이 스티커. `python tools/make_icons.py`로 다시 만들어요 |
 | `tests/smoke.py` | Playwright 화면 확인 |
 
 ### 원소 데이터 쓰는 법
@@ -67,7 +69,8 @@
 - `seen` = 스티커, `friends` = 반짝이 스티커 (코드에서는 예전 이름 friend를 그대로 써요)
 
 ## 고칠 때 순서
-1. 문법 검사: `for f in js/*.js; do node --check $f; done`
+0. 코드를 고쳤으면 `sw.js` 맨 위 `VERSION`을 하나 올려요 (현재 **v1**). 새 파일이 생기면 `SHELL_FILES`에도 넣어요. 안 올리면 설치한 앱이 옛 화면을 보여 줄 수 있어요.
+1. 문법 검사: `for f in js/*.js sw.js; do node --check $f; done`
 2. 화면 확인 (`webapp-testing` 스킬 방식, Playwright + 설치된 Chrome):
    ```
    python tests/smoke.py
@@ -76,14 +79,13 @@
    - 데스크톱(1280), 처음 시작(기록 없음), 휴대폰(412) 화면을 확인하고 `tests/screenshots/`에 찍어요. 스크린샷은 직접 열어 보고 디자인을 점검해요.
    - 스킬의 `with_server.py`는 쓰지 않아요. Windows에서는 서버를 셸로 띄워서, 끝난 뒤에도 `http.server`가 남아 포트를 막아요 (그러면 `ERR_EMPTY_RESPONSE`).
    - Edge headless(`--screenshot`)도 쓰지 않아요. 음성 기능이 있던 시절 speechSynthesis 때문에 멈췄고, 프로세스가 남아요.
-   - 확인 항목: 칸 상태, 카드, 상하좌우 이동(Cr↕Mo↕W, Y→La→Ac, H 위 막힘), 반짝이 도전 성공과 실패, 가족 설명, 검색, 퀴즈 10문제, 요리, 휴대폰 화면 넘침.
+   - 확인 항목: 칸 상태, 카드, 상하좌우 이동(Cr↕Mo↕W, Y→La→Ac, H 위 막힘), 반짝이 도전 성공과 실패, 가족 설명, 검색, 퀴즈 10문제, 요리, 휴대폰 화면 넘침, PWA(manifest, 아이콘, 서비스 워커를 직접 등록해서 SHELL_FILES가 모두 캐시되는지).
    - 테스트는 `localStorage`에 `muted: true`를 넣고 시작해서 소리가 나지 않아요.
 3. 커밋 메시지는 한국어 제목 한 줄 + 바뀐 점. **push는 사용자가 하라고 할 때만** 해요.
 
 ## 다음에 할 일 후보
 - 자리 찾기 퍼즐: 원소를 주기율표 빈칸에 끌어다 놓기
 - 가족 하나를 다 모으면 뱃지
-- PWA (태블릿 홈 화면에 설치, 오프라인)
 - 요리 레시피 추가 (`PALETTE`에 원소를 더하면 더 많이 만들 수 있어요)
 
 ## 하지 말 것

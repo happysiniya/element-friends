@@ -36,6 +36,8 @@ js/elements.js      118개 원소 데이터 (이름, 설명, 어디서 만나 �
 js/app.js           주기율표, 원소 카드, 반짝이 도전, 저장, 효과음
 js/quiz.js          퀴즈
 js/kitchen.js       원소 요리사 (레시피는 이 파일의 RECIPES)
+manifest.json, sw.js  앱 설치(PWA)와 오프라인
+icon-192/512.png    앱 아이콘 (tools/make_icons.py로 만들어요)
 tests/smoke.py      화면 자동 확인 (Playwright)
 ```
 

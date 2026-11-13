@@ -206,6 +206,29 @@ with sync_playwright() as p:
     shot(page, "11-mobile-quiz")
     ctx.close()
 
+    # ---- 앱 설치 (PWA) ----
+    # 사이트(https)에서는 index.html이 sw.js를 등록해요. 여기(http)서는 직접 등록해서
+    # SHELL_FILES가 모두 있어 설치가 끝까지 되는지 확인해요.
+    print("[pwa]")
+    ctx, page = new_page(browser, EMPTY, {"width": 1280, "height": 900})
+    manifest = page.evaluate("fetch('manifest.json').then(r => r.json())")
+    check("manifest name", manifest.get("name") == "원소 친구 도감")
+    icons_ok = page.evaluate("""Promise.all(['icon-192.png','icon-512.png'].map(
+        f => fetch(f).then(r => r.ok && r.headers.get('content-type').startsWith('image/png'))))""")
+    check("icons served", all(icons_ok))
+    check("manifest linked", page.locator('link[rel="manifest"]').count() == 1)
+    state = page.evaluate("""async () => {
+        const reg = await navigator.serviceWorker.register('sw.js');
+        await navigator.serviceWorker.ready;
+        const keys = await caches.keys();
+        const shell = keys.find(k => k.startsWith('shell-'));
+        const cached = shell ? (await (await caches.open(shell)).keys()).length : 0;
+        return { active: !!reg.active, cached };
+    }""")
+    check("service worker installs", state["active"])
+    check("shell files cached", state["cached"] >= 10)
+    ctx.close()
+
     browser.close()
 
 server.shutdown()
